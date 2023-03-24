@@ -10,11 +10,11 @@ import win32com.client  # pip install pywin32
 output_dir = Path.cwd() / "Output"
 output_dir.mkdir(parents=True, exist_ok=True)
 
-# Connect to outlook
+# Connect to outlook application on local system, NOT web API
 outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
 
 # Connect to folder
-# inbox = outlook.Folders("youremail@provider.com").Folders("Inbox")
+# inbox = outlook.Folders("youremail@provider.com").Folders("Inbox")  # For multiple outlook accounts
 inbox = outlook.GetDefaultFolder(6)
 
 # https://docs.microsoft.com/en-us/office/vba/api/outlook.oldefaultfolders
@@ -24,6 +24,9 @@ inbox = outlook.GetDefaultFolder(6)
 messages = inbox.Items
 
 for message in messages:
+    # if 'paypal deposit notice' in str(message.Subject):        # Filter by subject
+    # if msg.SenderEmailAddress == 'xxxxx@gmail.com':          # Filter by sender. This can be combined^
+    # DoSomething
     html_body = message.HTMLBody
     subject = message.Subject
 
