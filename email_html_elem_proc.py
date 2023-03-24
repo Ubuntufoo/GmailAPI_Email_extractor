@@ -16,6 +16,7 @@ outlook = win32com.client.Dispatch("Outlook.Application").GetNamespace("MAPI")
 # Connect to folder
 # inbox = outlook.Folders("youremail@provider.com").Folders("Inbox")
 inbox = outlook.GetDefaultFolder(6)
+
 # https://docs.microsoft.com/en-us/office/vba/api/outlook.oldefaultfolders
 # DeletedItems=3, Outbox=4, SentMail=5, Inbox=6, Drafts=16, FolderJunk=23
 
