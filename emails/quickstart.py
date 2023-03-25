@@ -72,14 +72,14 @@ def main():
 
                     # Now, the data obtained is in lxml. So, we will parse
                     # it with BeautifulSoup library
-                    # soup = BeautifulSoup(decoded_data , "lxml")
-                    # body = soup.body()
+                    soup = BeautifulSoup(decoded_data , "lxml")
+                    body = soup.body()
 
                     # Printing the subject, sender's email and message
 
                     print("Subject: ", subject)
                     print("From: ", sender)
-                    print("Message: ", decoded_data)
+                    print("Message: ", body)
                     print('\n')
                 except:
                     pass
