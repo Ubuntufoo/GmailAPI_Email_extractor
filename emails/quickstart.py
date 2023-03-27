@@ -10,6 +10,8 @@ from googleapiclient.errors import HttpError
 from bs4 import BeautifulSoup
 import base64
 
+from .models import Emails
+
 # Manage credentials and Gmail console configuration at https://console.cloud.google.com/welcome?project=mygmailapi-381619
 
 # Define the scopes to authorize access to user's Gmail account
@@ -90,7 +92,7 @@ def main():
                         print("Subject: ", subject)
                         print("From: ", sender)
 
-                        # search for all occurances of target words in the soup content using lambda function
+                        # search for all occurrences of target words in the soup content using lambda function
                         targets = ["testing", "database", "donation"]
                         results = soup.find_all(string=lambda text: text and any(target in text.lower() for target in targets))
                         if len(results) > 0:
