@@ -53,7 +53,7 @@ def main():
         if not messages:
             print("You have no new messages.")
         else:
-            print('Number of messages before parse:', len(messages))
+            print('Number of messages before parse:', len(messages), '\n')
             for msg in messages:
                 # Get the full message data from its id
                 txt = service.users().messages().get(userId='me', id=msg['id']).execute()
@@ -91,13 +91,13 @@ def main():
                         print("From: ", sender)
 
                         # search for all occurances of target words in the soup content using lambda function
-                        targets = ["testing", "database", "donation", "contact"]
+                        targets = ["testing", "database", "donation"]
                         results = soup.find_all(string=lambda text: text and any(target in text.lower() for target in targets))
                         if len(results) > 0:
                             for result in results:
                                 print(result)
                         else:
-                            print(f"No occurrences of '{results}' found in the soup.")
+                            print(f"No occurrences of '{results}' found.")
 
                         # search specific elements and remove their attr for easier viewing in terminal
                         # for a in soup.find_all('a'):
@@ -105,7 +105,6 @@ def main():
                         # for p in soup.find_all('p'):
                         #     p.attrs = {}
                         #     print(p)
-                        print('\n')
                     else:
                         print(f"Message {msg['id']} has no parsable body data.")
 
