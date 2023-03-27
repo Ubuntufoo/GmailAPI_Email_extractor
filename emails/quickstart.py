@@ -1,16 +1,28 @@
 from __future__ import print_function
 
+import os
 import os.path
+import sys
+import random
+import base64
+import django
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-from bs4 import BeautifulSoup
-import base64
 
-from .models import Emails
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+sys.path.insert(0, BASE_DIR)
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'emailprocess.settings')
+django.setup()
+
+from bs4 import BeautifulSoup
+from django.core.mail import send_mail
+from emails.models import Emails
+
 
 # Manage credentials and Gmail console configuration at https://console.cloud.google.com/welcome?project=mygmailapi-381619
 
@@ -88,7 +100,7 @@ def main():
                         decoded_data = base64.b64decode(data)
                         # Parse the decoded HTML using BS4 and the 'lxml' parser which covers XML and HTML
                         soup = BeautifulSoup(decoded_data, 'lxml')
-                        body = soup.body()
+                        # body = soup.body()
                         print("Subject: ", subject)
                         print("From: ", sender)
 
@@ -98,6 +110,26 @@ def main():
                         if len(results) > 0:
                             for result in results:
                                 print(result)
+
+                            random_int = int(random.uniform(100, 1000)*100)/100
+                            body_str = " ".join(results)
+                            body_str_escaped = body_str.replace('\r', '\\r').replace('\n', '\\n')
+
+                            try:
+                                new_donation = Emails(subject=subject, body=body_str_escaped, sender=sender, donations=random_int)
+                                new_donation.save()
+                                print("New donation saved successfully")
+                            except Exception as e:
+                                print("Error while saving new donation:", str(e))
+
+                                # Define the email content
+                                # subject_admin = 'Urgent: Model saving issue'
+                                # message_admin = 'Dear Administrator,\n\nAn issue occurred that requires your immediate attention.\n\nBest regards,\nMy nifty little script.'
+                                # from_email_admin = 'timothymurphy123@gmail.com'
+                                # recipient_list_admin = ['timothymurphy123@gmail.com']
+                                # # Send the email
+                                # send_mail(subject_admin, message_admin, from_email_admin, recipient_list_admin, fail_silently=False)
+
                         else:
                             print(f"No occurrences of '{results}' found.")
 

@@ -9,3 +9,6 @@ class Emails(models.Model):
 
     def __str__(self):
         return self.sender
+
+    class Meta:
+        app_label = 'emails'
