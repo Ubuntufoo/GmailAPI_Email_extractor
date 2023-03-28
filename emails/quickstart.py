@@ -22,6 +22,7 @@ django.setup()
 from bs4 import BeautifulSoup
 from django.core.mail import send_mail
 from emails.models import Emails
+from django.conf import settings
 
 
 # Manage credentials and Gmail console configuration at https://console.cloud.google.com/welcome?project=mygmailapi-381619
@@ -83,13 +84,33 @@ def main():
                             subject = d['value']
                         if d['name'] == 'From':
                             sender = d['value']
+                            if '<' in sender and '>' in sender:
+                                sender_name, sender_address = sender.split('<')
+                                sender_name = sender_name.strip()
+                                sender_address = sender_address.strip('>')
+                            else:
+                                sender_address = sender
 
                     # Extract the message body (in HTML format) from the payload
                     if 'parts' in payload:
+                        data = None
                         for part in payload['parts']:
-                            if 'data' in part['body']:
-                                data = part['body']['data']
-                                break
+                            if part.get('filename'):
+                                # This part contains an attachment
+                                continue
+                            if part.get('parts'):
+                                # This part is multipart, so check each subpart
+                                for subpart in part['parts']:
+                                    if subpart.get('filename'):
+                                        # This subpart contains an attachment
+                                        continue
+                                    if 'data' in subpart['body']:
+                                        data = subpart['body']['data']
+                                        break
+                            else:
+                                if 'data' in part['body']:
+                                    data = part['body']['data']
+                                    break
                     else:
                         data = payload['body']['data']
 
@@ -109,29 +130,57 @@ def main():
                         results = soup.find_all(string=lambda text: text and any(target in text.lower() for target in targets))
                         if len(results) > 0:
                             for result in results:
-                                print(result)
+                                print("Email body:", result)
 
                             random_int = int(random.uniform(100, 1000)*100)/100
                             body_str = " ".join(results)
-                            body_str_escaped = body_str.replace('\r', '\\r').replace('\n', '\\n')
 
                             try:
-                                new_donation = Emails(subject=subject, body=body_str_escaped, sender=sender, donations=random_int)
-                                new_donation.save()
-                                print("New donation saved successfully")
+                                new_donation = Emails(subject=subject, body=body_str, sender=sender, donations=random_int)
+                                # new_donation.save()
+                                # print("New donation saved successfully. \n")
+                                try:
+                                    # Define email content and send thank you email
+                                    subject_admin = 'Thank you for your donation.'
+                                    message_admin = f"Dear {sender},\n\nThank you for your donation.\nIt has been added to our database.\nPapa needs a new pair of shoes!"
+                                    if sender_address in ['timothymurphy123@gmail.com', 'rmurph1@comcast.net', 'sylvieanna_15@hotmail.com']:
+                                        admin_recipient = [sender_address]
+                                        # Send the email
+                                        send_mail(
+                                            subject=subject_admin,
+                                            message=message_admin,
+                                            from_email=settings.EMAIL_HOST_USER,
+                                            recipient_list=admin_recipient,
+                                            fail_silently=False
+                                            )
+                                        print("'Thank you' email sent.\n")
+
+                                    else:
+                                        print("Sender not authorized, no email sent.\n")
+                                        return
+                                except Exception as e:
+                                    print("Error with sending ty email:", str(e), "\n")
+
                             except Exception as e:
-                                print("Error while saving new donation:", str(e))
+                                print("Error with donation database processing:", str(e), "\n")
 
                                 # Define the email content
-                                # subject_admin = 'Urgent: Model saving issue'
-                                # message_admin = 'Dear Administrator,\n\nAn issue occurred that requires your immediate attention.\n\nBest regards,\nMy nifty little script.'
+                                subject_admin = 'Urgent: Model saving issue'
+                                message_admin = 'Dear Administrator,\n\nAn issue occurred that requires your immediate attention.\n\nBest regards,\nMy nifty little script.'
                                 # from_email_admin = 'timothymurphy123@gmail.com'
                                 # recipient_list_admin = ['timothymurphy123@gmail.com']
-                                # # Send the email
-                                # send_mail(subject_admin, message_admin, from_email_admin, recipient_list_admin, fail_silently=False)
+                                # Send the email
+                                send_mail(
+                                    subject=subject_admin,
+                                    message=message_admin,
+                                    from_email=settings.EMAIL_HOST_USER,
+                                    recipient_list=[settings.RECIPIENT_ADDRESS],
+                                    fail_silently=False
+                                    )
+                                print("Error email sent to admin.\n")
 
                         else:
-                            print(f"No occurrences of '{results}' found.")
+                            print(f"No occurrences of '{results}' found.\n")
 
                         # search specific elements and remove their attr for easier viewing in terminal
                         # for a in soup.find_all('a'):
