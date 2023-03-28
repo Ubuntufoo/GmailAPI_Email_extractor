@@ -89,6 +89,7 @@ def main():
                                 sender_name = sender_name.strip()
                                 sender_address = sender_address.strip('>')
                             else:
+
                                 sender_address = sender
 
                     # Extract the message body (in HTML format) from the payload
