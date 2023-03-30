@@ -17,7 +17,6 @@ from googleapiclient.errors import HttpError
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
 print(BASE_DIR)
 sys.path.insert(0, BASE_DIR)
-print(sys.path)
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'emailprocess.settings')
 django.setup()
@@ -155,7 +154,7 @@ class Command(BaseCommand):
                                         # Define email content and send thank you email
                                         subject_admin = 'Thank you for your donation.'
                                         message_admin = f"Dear {sender},\n\nThank you for your donation.\nIt has been added to our database.\nPapa needs a new pair of shoes!"
-                                        if sender_address in ['timothymurphy123@gmail.com', 'rmurph1@comcast.net', 'sylvieanna_15@hotmail.com']:
+                                        if sender_address in ['rmurph1@comcast.net', 'timothymurphy123@gmail.com',  'sylvieanna_15@hotmail.com']:
                                             admin_recipient = [sender_address]
                                             # Send the email
                                             send_mail(
