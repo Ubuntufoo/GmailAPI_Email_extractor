@@ -216,11 +216,3 @@ class Command(BaseCommand):
             pass
             # TODO(developer) - Handle errors from gmail API.
             # print(f'An error occurred: {error}')
-
-
-
-
-
-
-
-
