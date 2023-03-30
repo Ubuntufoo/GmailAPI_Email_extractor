@@ -15,7 +15,6 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))))
-print(BASE_DIR)
 sys.path.insert(0, BASE_DIR)
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'emailprocess.settings')
@@ -40,9 +39,6 @@ class Command(BaseCommand):
         """Shows basic usage of the Gmail API.
         Lists the user's Gmail labels.
         """
-
-        file = open(r'C:\Users\timmu\Documents\Coding Projects\email_processor\emails\management\commands\testscript.txt', 'a')
-        file.write(f'{datetime.datetime.now()} - The script ran \n')
 
         creds = None
         # The file token.json stores the user's access and refresh tokens, and is
@@ -76,14 +72,15 @@ class Command(BaseCommand):
             messages = results.get('messages', [])
 
             if not messages:
-                print("You have no new messages.")
+                pass
+                # print("You have no new messages.")
             else:
-                print('Number of messages before parse:', len(messages), '\n')
+
                 for msg in messages:
+
                     # Get the full message data from its id
                     txt = service.users().messages().get(userId='me', id=msg['id']).execute()
                     try:
-                        print("Message ID:", msg['id'])
                         # Get value of 'payload'(actual content) and 'headers' from dictionary 'txt'
                         payload = txt['payload']
                         headers = payload['headers']
@@ -132,24 +129,19 @@ class Command(BaseCommand):
                             decoded_data = base64.b64decode(data)
                             # Parse the decoded HTML using BS4 and the 'lxml' parser which covers XML and HTML
                             soup = BeautifulSoup(decoded_data, 'lxml')
+                            # file = open(r'C:\Users\timmu\Documents\Coding Projects\email_processor\emails\management\commands\loggingtest.txt', 'a')
+                            # file.write(f'{datetime.datetime.now()} - {soup} \n')
                             # body = soup.body()
-                            print("Subject: ", subject)
-                            print("From: ", sender)
 
                             # search for all occurrences of target words in the soup content using lambda function
                             targets = ["testing", "database", "donation"]
                             results = soup.find_all(string=lambda text: text and any(target in text.lower() for target in targets))
                             if len(results) > 0:
-                                for result in results:
-                                    print("Email body:", result)
-
-                                random_int = int(random.uniform(100, 1000)*100)/100
-                                body_str = " ".join(results)
-
                                 try:
+                                    random_int = int(random.uniform(100, 1000)*100)/100
+                                    body_str = " ".join(results)
                                     # new_donation = Emails(subject=subject, body=body_str, sender=sender, donations=random_int)
                                     # new_donation.save()
-                                    print("New donation saved successfully. \n")
                                     try:
                                         # Define email content and send thank you email
                                         subject_admin = 'Thank you for your donation.'
@@ -164,16 +156,18 @@ class Command(BaseCommand):
                                                 recipient_list=admin_recipient,
                                                 fail_silently=False
                                                 )
-                                            print("'Thank you' email sent.\n")
+                                            # print("'Thank you' email sent.\n")
 
                                         else:
-                                            print("Sender not authorized, no email sent.\n")
+                                            # print("Sender not authorized, no email sent.\n")
                                             return
                                     except Exception as e:
-                                        print("Error with sending ty email:", str(e), "\n")
+                                        pass
+                                        # print("Error with sending ty email:", str(e), "\n")
 
                                 except Exception as e:
-                                    print("Error with donation database processing:", str(e), "\n")
+                                    pass
+                                    # print("Error with donation database processing:", str(e), "\n")
 
                                     # Define the email content
                                     subject_admin = 'Urgent: Model saving issue'
@@ -188,10 +182,11 @@ class Command(BaseCommand):
                                         recipient_list=[settings.RECIPIENT_ADDRESS],
                                         fail_silently=False
                                         )
-                                    print("Error email sent to admin.\n")
+                                    # print("Error email sent to admin.\n")
 
                             else:
-                                print(f"No occurrences of '{results}' found.\n")
+                                pass
+                                # print(f"No occurrences of '{results}' found.\n")
 
                             # search specific elements and remove their attr for easier viewing in terminal
                             # for a in soup.find_all('a'):
@@ -200,15 +195,18 @@ class Command(BaseCommand):
                             #     p.attrs = {}
                             #     print(p)
                         else:
-                            print(f"Message {msg['id']} has no parsable body data.")
+                            pass
+                            # print(f"Message {msg['id']} has no parsable body data.")
 
                     except Exception as e:
+                        pass
                         # If there was an error parsing the message, print the error
-                        print(f"Error parsing message {msg['id']}: {str(e)}")
+                        # print(f"Error parsing message {msg['id']}: {str(e)}")
 
         except HttpError as error:
+            pass
             # TODO(developer) - Handle errors from gmail API.
-            print(f'An error occurred: {error}')
+            # print(f'An error occurred: {error}')
 
 
 
