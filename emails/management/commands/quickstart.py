@@ -80,6 +80,7 @@ class Command(BaseCommand):
 
                     # Get the full message data from its id
                     txt = service.users().messages().get(userId='me', id=msg['id']).execute()
+
                     try:
                         # Get value of 'payload'(actual content) and 'headers' from dictionary 'txt'
                         payload = txt['payload']
@@ -132,6 +133,8 @@ class Command(BaseCommand):
                             # file = open(r'C:\Users\timmu\Documents\Coding Projects\email_processor\emails\management\commands\loggingtest.txt', 'a')
                             # file.write(f'{datetime.datetime.now()} - {soup} \n')
                             # body = soup.body()
+
+                            # service.users().messages().modify(userId='me', id=msg['id'], body={ 'removeLabelIds': ['UNREAD'] })
 
                             # search for all occurrences of target words in the soup content using lambda function
                             targets = ["testing", "database", "donation"]
